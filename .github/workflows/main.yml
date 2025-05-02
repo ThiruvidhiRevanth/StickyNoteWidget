@@ -1,118 +1,87 @@
-name: Flutter Desktop Release
+name: "Build"
 
 on:
+  pull_request:
+    branches: [dev, test]
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [dev, test]
 
 jobs:
-
-  build-windows:
-    name: Build for Windows
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.29.3'
-
-      - name: Enable Windows build
-        run: flutter config --enable-windows-desktop
-
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build Windows
-        run: flutter build windows
-
-      - name: Zip .exe for release
-        run: |
-          Compress-Archive -Path build\windows\runner\Release\* -DestinationPath StickNoteWidget-Windows.zip
-          Move-Item StickNoteWidget-Windows.zip ${{ github.workspace }}
-
-      - name: Upload .exe as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: StickNoteWidget-Windows
-          path: StickNoteWidget-Windows.zip
-
-      - name: Upload to GitHub Release (Windows)
-        uses: softprops/action-gh-release@v2
-        if: "startsWith(github.ref, 'refs/tags/')"
-        with:
-          files: StickNoteWidget-Windows.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   build-macos:
-    name: Build for macOS
+    name: Build Android, iOS, macOS
     runs-on: macos-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Flutter
+      - name: Set Up Java
+        uses: actions/setup-java@v3.12.0
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+      - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.22.2'
+          channel: 'stable'
 
-      - name: Enable macOS build
-        run: flutter config --enable-macos-desktop
-
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
-
-      - name: Get dependencies
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build macOS
-        run: flutter build macos --verbose
+      - name: Build macOS App
+        run: flutter build macos
 
-      - name: Check if build output exists
+      - name: Compress iOS and macOS Builds
         run: |
-          if [ ! -d "build/macos/Build/Products/Release/Runner.app" ]; then
-            echo "Runner.app not found. Build may have failed."
-            exit 1
-          fi
+          cd build
+          tar -czf macos_build.tar.gz macos
 
-      - name: Create DMG
-        run: |
-          cd build/macos/Build/Products/Release
-          hdiutil create -volname StickNoteWidget \
-                         -srcfolder "Runner.app" \
-                         -ov -format UDZO StickNoteWidget.dmg
-          mv StickNoteWidget.dmg $GITHUB_WORKSPACE/StickNoteWidget-macOS.dmg
-
-      - name: Upload DMG Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: StickNoteWidget-macOS
-          path: StickNoteWidget-macOS.dmg
+          name: Releases-macos
+          path: |
+            build/macos_build.tar.gz
 
-      - name: Upload to GitHub Release (macOS)
-        uses: softprops/action-gh-release@v2
-        if: "startsWith(github.ref, 'refs/tags/')"
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
         with:
-          files: StickNoteWidget-macOS.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: |
+            build/macos_build.tar.gz
+          tag: v${{ env.VERSION }}
+          token: ${{ secrets.TOKEN }}
+
+  build-windows:
+    name: Build Windows App
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Build Windows App
+        run: flutter build windows
+
+      - name: Compress Windows Build
+        run: Compress-Archive -Path build\windows -DestinationPath build\windows_build.zip
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Releases-windows
+          path: build/windows_build.zip
