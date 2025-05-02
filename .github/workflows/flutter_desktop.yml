@@ -4,6 +4,7 @@ on:
     tags:
       - 'v*.*.*'
   workflow_dispatch:
+
 env:
   APP_NAME: StickNoteWidget
   FLUTTER_VERSION: '3.22.0'
@@ -117,18 +118,14 @@ jobs:
             exit 1
           fi
 
-      - name: Debug secrets context
-        run: |
-          if [ -z "${{ secrets.MACOS_SIGNING_CERT }}" ]; then
-            echo "MACOS_SIGNING_CERT is empty or not set"
-          else
-            echo "MACOS_SIGNING_CERT is set (value not shown for security)"
-          fi
+      - name: Set MACOS_SIGNING_CERT env
+        run: echo "MACOS_SIGNING_CERT=${{ secrets.MACOS_SIGNING_CERT }}" >> $GITHUB_ENV
+        shell: bash
 
       - name: Code sign macOS app
+        if: env.MACOS_SIGNING_CERT != ''
         run: |
-          codesign --force --deep --sign "${{ secrets.MACOS_SIGNING_CERT }}" build/macos/Build/Products/Release/${{ env.APP_NAME }}.app
-        if: ${{ secrets.MACOS_SIGNING_CERT != '' }}
+          codesign --force --deep --sign "$MACOS_SIGNING_CERT" build/macos/Build/Products/Release/${{ env.APP_NAME }}.app
 
       - name: Create artifacts directory
         run: mkdir -p artifacts
