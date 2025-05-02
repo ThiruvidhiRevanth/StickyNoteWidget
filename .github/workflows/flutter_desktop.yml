@@ -5,20 +5,32 @@ on:
     tags:
       - 'v*.*.*'
 
-jobs:
+env:
+  APP_NAME: StickNoteWidget
+  FLUTTER_VERSION: '3.22.0'
 
+jobs:
   build-windows:
     name: Build for Windows
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Enable Windows build
         run: flutter config --enable-windows-desktop
@@ -26,39 +38,58 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Run tests
+        run: flutter test
+
       - name: Build Windows
         run: flutter build windows
 
+      - name: Check if build output exists
+        run: |
+          if (!(Test-Path "build\windows\x64\runner\Release\${{ env.APP_NAME }}.exe")) {
+            Write-Error "${{ env.APP_NAME }}.exe not found. Build may have failed."
+            exit 1
+          }
+
       - name: Zip .exe for release
         run: |
-          Compress-Archive -Path build\windows\runner\Release\* -DestinationPath StickNoteWidget-Windows.zip
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath artifacts/${{ env.APP_NAME }}-Windows-${{ github.ref_name }}.zip
 
       - name: Upload .exe as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StickNoteWidget-Windows
-          path: StickNoteWidget-Windows.zip
+          name: ${{ env.APP_NAME }}-Windows-${{ github.ref_name }}
+          path: artifacts/${{ env.APP_NAME }}-Windows-${{ github.ref_name }}.zip
 
       - name: Upload to GitHub Release (Windows)
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: StickNoteWidget-Windows.zip
+          files: artifacts/${{ env.APP_NAME }}-Windows-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
-    name: Build for macOS
+    name: Build fucrt itor macOS
     runs-on: macos-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Enable macOS build
         run: flutter config --enable-macos-desktop
@@ -66,34 +97,42 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Run tests
+        run: flutter test
+
       - name: Build macOS
         run: flutter build macos
 
       - name: Check if build output exists
         run: |
-          if [ ! -d "build/macos/Build/Products/Release/Runner.app" ]; then
-            echo "Runner.app not found. Build may have failed."
+          if [ ! -d "build/macos/Build/Products/Release/${{ env.APP_NAME }}.app" ]; then
+            echo "${{ env.APP_NAME }}.app not found. Build may have failed."
             exit 1
           fi
+
+      - name: Code sign macOS app
+        run: |
+          codesign --force --deep --sign "${{ secrets.MACOS_SIGNING_CERT }}" build/macos/Build/Products/Release/${{ env.APP_NAME }}.app
+        if: secrets.MACOS_SIGNING_CERT != ''
 
       - name: Create DMG
         run: |
           cd build/macos/Build/Products/Release
-          hdiutil create -volname StickNoteWidget \
-                         -srcfolder "Runner.app" \
-                         -ov -format UDZO StickNoteWidget.dmg
-          mv StickNoteWidget.dmg ../../../../StickNoteWidget-macOS.dmg
+          hdiutil create -volname ${{ env.APP_NAME }} \
+                         -srcfolder "${{ env.APP_NAME }}.app" \
+                         -ov -format UDZO ${{ env.APP_NAME }}.dmg
+          mv ${{ env.APP_NAME }}.dmg ../../../../artifacts/${{ env.APP_NAME }}-macOS-${{ github.ref_name }}.dmg
 
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StickNoteWidget-macOS
-          path: build/StickNoteWidget-macOS.dmg
+          name: ${{ env.APP_NAME }}-macOS-${{ github.ref_name }}
+          path: artifacts/${{ env.APP_NAME }}-macOS-${{ github.ref_name }}.dmg
 
       - name: Upload to GitHub Release (macOS)
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: build/StickNoteWidget-macOS.dmg
+          files: artifacts/${{ env.APP_NAME }}-macOS-${{ github.ref_name }}.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
