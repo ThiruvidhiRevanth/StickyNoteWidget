@@ -22,7 +22,7 @@ jobs:
       - name: Set Up Flutter
         uses: actions/upload-artifact@v4
         with:
-          flutter-version: '3.22.2'
+          flutter-version: '3.29.3'
           channel: 'stable'
 
       - name: Install Dependencies
@@ -63,7 +63,7 @@ jobs:
       - name: Set Up Flutter
         uses: actions/upload-artifact@v4
         with:
-          flutter-version: '3.22.2'
+          flutter-version: '3.29.3'
           channel: 'stable'
 
       - name: Install Dependencies
