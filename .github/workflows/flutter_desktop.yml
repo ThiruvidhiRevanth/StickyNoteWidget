@@ -1,40 +1,49 @@
-name: Flutter Desktop Build (Windows + macOS)
+name: Flutter Desktop Release
 
 on:
   push:
     tags:
-      - 'v*.*.*' # e.g., v1.0.0
+      - 'v*.*.*'
 
 jobs:
+
   build-windows:
     name: Build for Windows
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.1'
+          flutter-version: '3.19.0'
 
-      - run: flutter config --enable-windows-desktop
-      - run: flutter pub get
-      - run: flutter build windows
+      - name: Enable Windows build
+        run: flutter config --enable-windows-desktop
 
-      - name: Rename Windows artifact
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows
+
+      - name: Zip .exe for release
         run: |
-          mkdir dist
-          cp build/windows/runner/Release/*.exe dist/MyApp-Windows.exe
+          Compress-Archive -Path build\windows\runner\Release\* -DestinationPath StickNoteWidget-Windows.zip
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload .exe as artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: MyApp-Windows
-          path: dist/MyApp-Windows.exe
+          name: StickNoteWidget-Windows
+          path: StickNoteWidget-Windows.zip
 
       - name: Upload to GitHub Release (Windows)
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: dist/MyApp-Windows.exe
+          files: StickNoteWidget-Windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -43,32 +52,48 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.1'
+          flutter-version: '3.19.0'
 
-      - run: flutter config --enable-macos-desktop
-      - run: flutter pub get
-      - run: flutter build macos
+      - name: Enable macOS build
+        run: flutter config --enable-macos-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build macOS
+        run: flutter build macos
+
+      - name: Check if build output exists
+        run: |
+          if [ ! -d "build/macos/Build/Products/Release/Runner.app" ]; then
+            echo "Runner.app not found. Build may have failed."
+            exit 1
+          fi
 
       - name: Create DMG
         run: |
           cd build/macos/Build/Products/Release
-          hdiutil create -volname MyApp \
+          hdiutil create -volname StickNoteWidget \
                          -srcfolder "Runner.app" \
-                         -ov -format UDZO MyApp.dmg
-          mv MyApp.dmg ../../../MyApp-macOS.dmg
+                         -ov -format UDZO StickNoteWidget.dmg
+          mv StickNoteWidget.dmg ../../../../StickNoteWidget-macOS.dmg
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: MyApp-macOS
-          path: build/MyApp-macOS.dmg
+          name: StickNoteWidget-macOS
+          path: build/StickNoteWidget-macOS.dmg
 
       - name: Upload to GitHub Release (macOS)
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: build/MyApp-macOS.dmg
+          files: build/StickNoteWidget-macOS.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
