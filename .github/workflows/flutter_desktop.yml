@@ -1,47 +1,148 @@
-name: Flutter Desktop Build (Windows + macOS)
-
+name: Flutter Desktop Release
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+env:
+  APP_NAME: StickNoteWidget
+  FLUTTER_VERSION: '3.22.0'
 
 jobs:
   build-windows:
     name: Build for Windows
     runs-on: windows-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
         with:
-          flutter-version: '3.19.0'
-      - run: flutter config --enable-windows-desktop
-      - run: flutter pub get
-      - run: flutter build windows
-      - uses: actions/upload-artifact@v3
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          name: MyApp-Windows
-          path: build/windows/runner/Release/*.exe
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Enable Windows build
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test || true
+
+      - name: Build Windows
+        run: flutter build windows
+
+      - name: Debug build output
+        run: dir build\windows\x64\runner\Release
+        shell: powershell
+
+      - name: Check if build output exists
+        run: |
+          if (!(Test-Path "build\windows\x64\runner\Release\${{ env.APP_NAME }}.exe")) {
+            Write-Error "${{ env.APP_NAME }}.exe not found. Build may have failed."
+            exit 1
+          }
+
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
+      - name: Zip .exe for release
+        run: |
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath artifacts/${{ env.APP_NAME }}-Windows.zip
+
+      - name: Upload .exe as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-Windows
+          path: artifacts/${{ env.APP_NAME }}-Windows.zip
+
+      - name: Upload to GitHub Release (Windows)
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: artifacts/${{ env.APP_NAME }}-Windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
     name: Build for macOS
     runs-on: macos-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
         with:
-          flutter-version: '3.19.0'
-      - run: flutter config --enable-macos-desktop
-      - run: flutter pub get
-      - run: flutter build macos
-      - run: |
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Enable macOS build
+        run: flutter config --enable-macos-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test || true
+
+      - name: Build macOS
+        run: flutter build macos
+
+      - name: Debug build output
+        run: ls -R build/macos/Build/Products/Release
+
+      - name: Check if build output exists
+        run: |
+          if [ ! -d "build/macos/Build/Products/Release/${{ env.APP_NAME }}.app" ]; then
+            echo "${{ env.APP_NAME }}.app not found. Build may have failed."
+            exit 1
+          fi
+
+      - name: Code sign macOS app
+        run: |
+          codesign --force --deep --sign "${{ secrets.MACOS_SIGNING_CERT }}" build/macos/Build/Products/Release/${{ env.APP_NAME }}.app
+        if: secrets.MACOS_SIGNING_CERT != ''
+
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
+      - name: Create DMG
+        run: |
           cd build/macos/Build/Products/Release
-          hdiutil create -volname MyApp \
-                         -srcfolder "Runner.app" \
-                         -ov -format UDZO MyApp.dmg
-      - uses: actions/upload-artifact@v3
+          hdiutil create -volname ${{ env.APP_NAME }} \
+                         -srcfolder "${{ env.APP_NAME }}.app" \
+                         -ov -format UDZO ${{ env.APP_NAME }}.dmg
+          mv ${{ env.APP_NAME }}.dmg ../../../../artifacts/${{ env.APP_NAME }}-macOS.dmg
+
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: MyApp-macOS
-          path: build/macos/Build/Products/Release/MyApp.dmg
+          name: ${{ env.APP_NAME }}-macOS
+          path: artifacts/${{ env.APP_NAME }}-macOS.dmg
+
+      - name: Upload to GitHub Release (macOS)
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: artifacts/${{ env.APP_NAME }}-macOS.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
