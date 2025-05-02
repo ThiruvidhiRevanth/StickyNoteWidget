@@ -1,0 +1,47 @@
+name: Flutter Desktop Build (Windows + macOS)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter build windows
+      - uses: actions/upload-artifact@v3
+        with:
+          name: MyApp-Windows
+          path: build/windows/runner/Release/*.exe
+
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+      - run: flutter config --enable-macos-desktop
+      - run: flutter pub get
+      - run: flutter build macos
+      - run: |
+          cd build/macos/Build/Products/Release
+          hdiutil create -volname MyApp \
+                         -srcfolder "Runner.app" \
+                         -ov -format UDZO MyApp.dmg
+      - uses: actions/upload-artifact@v3
+        with:
+          name: MyApp-macOS
+          path: build/macos/Build/Products/Release/MyApp.dmg
