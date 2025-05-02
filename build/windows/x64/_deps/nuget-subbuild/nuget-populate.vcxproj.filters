@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-copyfile.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\fbf2d6a30b37dd75fd88f9285d030be8\nuget-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\82d29270fe226e4551e1fab7960bbcb3\nuget-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\4bf1fc2bceba70bfd67fc519c658573b\nuget-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\projects\windows_widget\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\nuget-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{6E0BED80-F493-39D7-A0A4-FD497263E797}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

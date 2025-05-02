@@ -1,0 +1,70 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter run -d windows
+
+## exception
+
+StateError: Bad state: WebSocketChannelException: SocketException: The remote computer refused the network connection.
+ (OS Error: The remote computer refused the network connection.
+, errno = 1225), address = 127.0.0.1, port = 57858
+
+```
+#0      DartDevelopmentService.startDartDevelopmentService (package:flutter_tools/src/base/dds.dart:290:9)
+<asynchronous suspension>
+#1      FlutterDevice.connect.<anonymous closure> (package:flutter_tools/src/resident_runner.dart:294:11)
+<asynchronous suspension>
+```
+
+## flutter doctor
+
+```
+[32m[✓][39m Flutter (Channel beta, 3.25.0-0.1.pre, on Microsoft Windows [Version 10.0.27842.1000], locale en-IN)
+    [32m•[39m Flutter version 3.25.0-0.1.pre on channel beta at D:\flutter\flutter
+    [32m•[39m Upstream repository https://github.com/flutter/flutter.git
+    [32m•[39m Framework revision d3733fcb0e (8 months ago), 2024-08-21 10:27:04 -0500
+    [32m•[39m Engine revision 062b3a72fc
+    [32m•[39m Dart version 3.6.0 (build 3.6.0-149.3.beta)
+    [32m•[39m DevTools version 2.38.0
+
+[32m[✓][39m Windows Version (Installed version of Windows is version 10 or higher)
+
+[32m[✓][39m Android toolchain - develop for Android devices (Android SDK version 34.0.0)
+    [32m•[39m Android SDK at C:\Users\jahna\AppData\Local\Android\Sdk
+    [32m•[39m Platform android-35, build-tools 34.0.0
+    [32m•[39m Java binary at: D:\AndroidStudio\jbr\bin\java
+    [32m•[39m Java version OpenJDK Runtime Environment (build 17.0.9+0--11185874)
+    [32m•[39m All Android licenses accepted.
+
+[32m[✓][39m Chrome - develop for the web
+    [32m•[39m Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[32m[✓][39m Visual Studio - develop Windows apps (Visual Studio Community 2022 17.8.4)
+    [32m•[39m Visual Studio at C:\Program Files\Microsoft Visual Studio\2022\Community
+    [32m•[39m Visual Studio Community 2022 version 17.8.34408.163
+    [32m•[39m Windows 10 SDK version 10.0.22621.0
+
+[32m[✓][39m Android Studio (version 2023.2)
+    [32m•[39m Android Studio at D:\AndroidStudio
+    [32m•[39m Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    [32m•[39m Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    [32m•[39m Java version OpenJDK Runtime Environment (build 17.0.9+0--11185874)
+
+[32m[✓][39m VS Code (version 1.99.3)
+    [32m•[39m VS Code at C:\Users\jahna\AppData\Local\Programs\Microsoft VS Code
+    [32m•[39m Flutter extension version 3.108.0
+
+[32m[✓][39m Connected device (3 available)
+    [32m•[39m Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.27842.1000]
+    [32m•[39m Chrome (web)      • chrome  • web-javascript • Google Chrome 135.0.7049.115
+    [32m•[39m Edge (web)        • edge    • web-javascript • Microsoft Edge 136.0.3240.37
+
+[32m[✓][39m Network resources
+    [32m•[39m All expected network resources are available.
+
+[32m•[39m No issues found!
+```

@@ -117,10 +117,18 @@ jobs:
             exit 1
           fi
 
+      - name: Debug secrets context
+        run: |
+          if [ -z "${{ secrets.MACOS_SIGNING_CERT }}" ]; then
+            echo "MACOS_SIGNING_CERT is empty or not set"
+          else
+            echo "MACOS_SIGNING_CERT is set (value not shown for security)"
+          fi
+
       - name: Code sign macOS app
         run: |
           codesign --force --deep --sign "${{ secrets.MACOS_SIGNING_CERT }}" build/macos/Build/Products/Release/${{ env.APP_NAME }}.app
-        if: secrets.MACOS_SIGNING_CERT != ''
+        if: ${{ secrets.MACOS_SIGNING_CERT != '' }}
 
       - name: Create artifacts directory
         run: mkdir -p artifacts

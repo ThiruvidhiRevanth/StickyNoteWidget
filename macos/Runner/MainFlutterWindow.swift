@@ -12,6 +12,6 @@ class MainFlutterWindow: BitsdojoWindow {
 
         RegisterGeneratedPlugins(registry: flutterViewController)
 
-        super.bitsdojoWindowDidLoad()
+      
     }
 }

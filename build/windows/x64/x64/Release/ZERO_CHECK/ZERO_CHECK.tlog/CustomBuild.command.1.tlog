@@ -1,0 +1,10 @@
+^D:\PROJECTS\WINDOWS_WIDGET\BUILD\WINDOWS\X64\CMAKEFILES\F3B1AF6A6E14D19790DAE91269B35D80\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/projects/windows_widget/windows -BD:/projects/windows_widget/build/windows/x64 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/projects/windows_widget/build/windows/x64/windows_widget.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

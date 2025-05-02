@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\projects\windows_widget\windows\flutter\ephemeral\.plugin_symlinks\bitsdojo_window_windows\windows\bitsdojo_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\projects\windows_widget\windows\flutter\ephemeral\.plugin_symlinks\bitsdojo_window_windows\windows\bitsdojo_window_api.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\projects\windows_widget\windows\flutter\ephemeral\.plugin_symlinks\bitsdojo_window_windows\windows\bitsdojo_window_plugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\projects\windows_widget\windows\flutter\ephemeral\.plugin_symlinks\bitsdojo_window_windows\windows\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{A7DC919B-10B7-30C4-9420-0E8D0C5704C2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
