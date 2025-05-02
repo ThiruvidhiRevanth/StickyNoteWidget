@@ -7,7 +7,7 @@ on:
 
 env:
   APP_NAME: StickNoteWidget
-  FLUTTER_VERSION: '3.22.0'
+  FLUTTER_VERSION: '3.29.3'
 
 jobs:
   build-windows:
