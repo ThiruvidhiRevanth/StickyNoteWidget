@@ -2,9 +2,8 @@ name: Flutter Desktop Build (Windows + macOS)
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    tags:
+      - 'v*.*.*' # e.g., v1.0.0
 
 jobs:
   build-windows:
@@ -22,10 +21,22 @@ jobs:
       - run: flutter pub get
       - run: flutter build windows
 
+      - name: Rename Windows artifact
+        run: |
+          mkdir dist
+          cp build/windows/runner/Release/*.exe dist/MyApp-Windows.exe
+
       - uses: actions/upload-artifact@v4
         with:
           name: MyApp-Windows
-          path: build/windows/runner/Release/*.exe
+          path: dist/MyApp-Windows.exe
+
+      - name: Upload to GitHub Release (Windows)
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MyApp-Windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
     name: Build for macOS
@@ -42,13 +53,22 @@ jobs:
       - run: flutter pub get
       - run: flutter build macos
 
-      - run: |
+      - name: Create DMG
+        run: |
           cd build/macos/Build/Products/Release
           hdiutil create -volname MyApp \
                          -srcfolder "Runner.app" \
                          -ov -format UDZO MyApp.dmg
+          mv MyApp.dmg ../../../MyApp-macOS.dmg
 
       - uses: actions/upload-artifact@v4
         with:
           name: MyApp-macOS
-          path: build/macos/Build/Products/Release/MyApp.dmg
+          path: build/MyApp-macOS.dmg
+
+      - name: Upload to GitHub Release (macOS)
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/MyApp-macOS.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
