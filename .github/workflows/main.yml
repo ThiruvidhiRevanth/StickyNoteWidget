@@ -37,7 +37,7 @@ jobs:
           tar -czf macos_build.tar.gz macos
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Releases-macos
           path: |
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set Up Flutter
         uses: actions/upload-artifact@v4
@@ -79,7 +79,7 @@ jobs:
         run: Compress-Archive -Path build\windows -DestinationPath build\windows_build.zip
 
       - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Releases-windows
           path: build/windows_build.zip
