@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=StickyNoteWidget
+Comment=A simple sticky note app
+Exec=/path/to/your/app/sticky_note_app
+Icon=\assets\app_icon.png
+Terminal=false
+Type=Application
+Categories=Utility;
