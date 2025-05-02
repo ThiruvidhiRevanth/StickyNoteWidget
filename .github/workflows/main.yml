@@ -20,10 +20,11 @@ jobs:
           java-version: '17'
 
       - name: Set Up Flutter
-        uses: actions/upload-artifact@v4
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.22.2'
           channel: 'stable'
+
 
       - name: Install Dependencies
         run: flutter pub get
@@ -61,9 +62,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set Up Flutter
-        uses: actions/upload-artifact@v4
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
+          flutter-version: '3.22.2'
           channel: 'stable'
 
       - name: Install Dependencies
