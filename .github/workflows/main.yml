@@ -23,6 +23,15 @@ jobs:
       - name: Enable Windows build
         run: flutter config --enable-windows-desktop
 
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -32,6 +41,7 @@ jobs:
       - name: Zip .exe for release
         run: |
           Compress-Archive -Path build\windows\runner\Release\* -DestinationPath StickNoteWidget-Windows.zip
+          Move-Item StickNoteWidget-Windows.zip ${{ github.workspace }}
 
       - name: Upload .exe as artifact
         uses: actions/upload-artifact@v4
@@ -41,7 +51,7 @@ jobs:
 
       - name: Upload to GitHub Release (Windows)
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        if: "startsWith(github.ref, 'refs/tags/')"
         with:
           files: StickNoteWidget-Windows.zip
         env:
@@ -63,11 +73,20 @@ jobs:
       - name: Enable macOS build
         run: flutter config --enable-macos-desktop
 
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Build macOS
-        run: flutter build macos
+        run: flutter build macos --verbose
 
       - name: Check if build output exists
         run: |
@@ -82,18 +101,18 @@ jobs:
           hdiutil create -volname StickNoteWidget \
                          -srcfolder "Runner.app" \
                          -ov -format UDZO StickNoteWidget.dmg
-          mv StickNoteWidget.dmg ../../../../StickNoteWidget-macOS.dmg
+          mv StickNoteWidget.dmg $GITHUB_WORKSPACE/StickNoteWidget-macOS.dmg
 
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StickNoteWidget-macOS
-          path: build/StickNoteWidget-macOS.dmg
+          path: StickNoteWidget-macOS.dmg
 
       - name: Upload to GitHub Release (macOS)
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        if: "startsWith(github.ref, 'refs/tags/')"
         with:
-          files: build/StickNoteWidget-macOS.dmg
+          files: StickNoteWidget-macOS.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
