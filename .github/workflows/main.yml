@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-macos:
-    name: Build Android, iOS, macOS
+    name: Build macOS App
     runs-on: macos-latest
 
     steps:
@@ -48,10 +48,10 @@ jobs:
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: |
-            build/macos_build.tar.gz
-          tag: v${{ env.VERSION }}
-          token: ${{ secrets.TOKEN }}
+          tag: ${{ github.ref_name }}
+          artifacts: "build/windows/runner/Release/*.exe"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
 
   build-windows:
     name: Build Windows App
@@ -73,8 +73,12 @@ jobs:
       - name: Enable Windows Desktop
         run: flutter config --enable-windows-desktop
 
-      - name: Build Windows App
+      - name: Remove old Windows build cache
+        run: rm -rf build/windows
+
+      - name: Build Windows app
         run: flutter build windows
+
 
       - name: Compress Windows Build
         run: Compress-Archive -Path build\windows -DestinationPath build\windows_build.zip
