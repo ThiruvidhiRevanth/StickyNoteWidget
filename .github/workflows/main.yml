@@ -36,7 +36,7 @@ jobs:
 
       - name: Verify build output
         run: |
-          if [ ! -d "build/macos/Build/Products/Release/StickyNoteWidget.app" ]; then
+          if [ ! -d "build/macos/Build/Products/Release/windows_widget.app" ]; then
             echo "Build output not found! Exiting."
             exit 1
           fi
