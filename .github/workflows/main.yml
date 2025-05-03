@@ -85,7 +85,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: build/windows/runner/Release/
+          path: build/windows/x64/runner/Release
 
   release:
     needs: [build-macos, build-windows]
@@ -102,7 +102,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: windows
-          path: build/windows/runner/Release/
+          path: release-assets/windows
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
@@ -110,5 +110,5 @@ jobs:
           tag: ${{ github.ref_name }}
           artifacts: |
             release-assets/macos/StickyNoteWidget.dmg
-            build/windows/runner/Release//*.exe
+            release-assets/windows/*.exe
           token: ${{ secrets.GITHUB_TOKEN }}
