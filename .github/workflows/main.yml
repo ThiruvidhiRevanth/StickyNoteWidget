@@ -23,7 +23,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.29.3" # or your version
+          flutter-version: "3.29.3"
           channel: stable
 
       - name: Install dependencies
@@ -33,22 +33,29 @@ jobs:
         run: |
           flutter clean
           flutter build macos --release
-      - name: List build folder
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "build/macos/Build/Products/Release/StickyNoteWidget.app" ]; then
+            echo "Build output not found! Exiting."
+            exit 1
+          fi
+
+      - name: Debug build folder
         run: ls -al build/macos/Build/Products/Release
 
+      - name: Create dist directory
+        run: mkdir -p dist
 
       - name: Create DMG
         run: |
-          mkdir -p dist
           hdiutil create -volname "StickyNote" -srcfolder build/macos/Build/Products/Release/StickyNoteWidget.app -ov -format UDZO dist/StickyNoteWidget.dmg
-
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: macOS
           path: dist/StickyNoteWidget.dmg
-
   build-windows:
     runs-on: windows-latest
 
