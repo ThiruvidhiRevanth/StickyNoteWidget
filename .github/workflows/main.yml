@@ -33,11 +33,15 @@ jobs:
         run: |
           flutter clean
           flutter build macos --release
+      - name: List build folder
+        run: ls -al build/macos/Build/Products/Release
+
 
       - name: Create DMG
         run: |
           mkdir -p dist
           hdiutil create -volname "StickyNote" -srcfolder build/macos/Build/Products/Release/StickyNoteWidget.app -ov -format UDZO dist/StickyNoteWidget.dmg
+
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
@@ -65,7 +69,9 @@ jobs:
         shell: pwsh
         run: |
           flutter clean
-          Remove-Item -Recurse -Force build/windows
+          if (Test-Path "build/windows") {
+             Remove-Item -Recurse -Force build/windows
+          }
           flutter build windows --release
 
       - name: Upload EXE
