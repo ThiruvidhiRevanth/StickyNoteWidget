@@ -1,90 +1,100 @@
-name: "Build"
+name: Build and Release Flutter App
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*' # e.g. v1.0.0
 
 jobs:
   build-macos:
-    name: Build macOS App
     runs-on: macos-latest
 
+    env:
+      JAVA_HOME: /Users/runner/hostedtoolcache/Java_Oracle_jdk/17/arm64/Contents/Home
+      JAVA_HOME_17_ARM64: /Users/runner/hostedtoolcache/Java_Oracle_jdk/17/arm64/Contents/Home
+      FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.29.3-arm64
+      PUB_CACHE: /Users/runner/.pub-cache
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Set Up Java
-        uses: actions/setup-java@v3.12.0
-        with:
-          distribution: 'oracle'
-          java-version: '17'
-
-      - name: Set Up Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.3'
-          channel: 'stable'
+          flutter-version: "3.19.6" # or your version
+          channel: stable
 
-
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build macOS App
-        run: flutter build macos
-
-      - name: Compress iOS and macOS Builds
+      - name: Clean and build macOS
         run: |
-          cd build
-          tar -czf macos_build.tar.gz macos
+          flutter clean
+          flutter build macos --release
 
-      - name: Upload Artifacts
+      - name: Create DMG
+        run: |
+          mkdir -p dist
+          hdiutil create -volname "StickyNote" -srcfolder build/macos/Build/Products/Release/StickyNoteWidget.app -ov -format UDZO dist/StickyNoteWidget.dmg
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: Releases-macos
-          path: |
-            build/macos_build.tar.gz
+          name: macOS
+          path: dist/StickyNoteWidget.dmg
 
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.19.6"
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Clean and build Windows
+        shell: pwsh
+        run: |
+          flutter clean
+          Remove-Item -Recurse -Force build/windows
+          flutter build windows --release
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: build/windows/runner/Release/
+
+  release:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macOS
+          path: release-assets/macos
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: release-assets/windows
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
-          artifacts: "build/windows/runner/Release/*.exe"
+          artifacts: |
+            release-assets/macos/StickyNoteWidget.dmg
+            release-assets/windows/*.exe
           token: ${{ secrets.GITHUB_TOKEN }}
-
-
-  build-windows:
-    name: Build Windows App
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set Up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.29.3'
-          channel: 'stable'
-
-      - name: Install Dependencies
-        run: flutter pub get
-
-      - name: Enable Windows Desktop
-        run: flutter config --enable-windows-desktop
-
-      - name: Remove old Windows build cache
-        run: rm -rf build/windows
-
-      - name: Build Windows app
-        run: flutter build windows
-
-
-      - name: Compress Windows Build
-        run: Compress-Archive -Path build\windows -DestinationPath build\windows_build.zip
-
-      - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Releases-windows
-          path: build/windows_build.zip
