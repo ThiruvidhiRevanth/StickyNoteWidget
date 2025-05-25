@@ -47,7 +47,7 @@ Go to the [Releases page](https://github.com/ThiruvidhiRevanth/StickyNoteWidget/
 
 ## Screenshots
 
-![StickyNoteWidget Screenshot](docs/screenshot.png) <!-- Add your screenshot here -->
+![StickyNoteWidget Screenshot](aasets/ss.png) <!-- Add your screenshot here -->
 
 ---
 
