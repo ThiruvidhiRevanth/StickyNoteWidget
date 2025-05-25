@@ -1,14 +1,14 @@
 # StickyNoteWidget
 
-A simple, beautiful, and powerful sticky notes application for Windows, macOS, and Linux desktops, built using Flutter. StickyNoteWidget lets you jot down thoughts, create multiple color-coded notes, set alarms, and enjoy a distraction-free, frameless window experience.
+A simple, beautiful, and powerful sticky notes application for Windows, macOS desktops, built using Flutter. StickyNoteWidget lets you jot down thoughts, create multiple color-coded notes, set alarms, and enjoy a distraction-free, frameless window experience.
 
 ---
 
 ## 🚀 Download
 
-**[⬇️ Latest Release (Windows, macOS, Linux)](https://github.com/yourusername/StickyNoteWidget/releases/latest)**
+**[⬇️ Latest Release (Windows, macOS)](https://github.com/yourusername/StickyNoteWidget/releases)**
 
-Go to the [Releases page](https://github.com/yourusername/StickyNoteWidget/releases/latest) and download the installer or zip for your platform.
+Go to the [Releases page](https://github.com/yourusername/StickyNoteWidget/releases) and download the installer or zip for your platform.
 
 ---
 
@@ -108,7 +108,6 @@ flutter_quill: ^10.1.1
 
 - [x] Windows
 - [x] macOS
-- [x] Linux
 
 > **Mobile is NOT supported.**
 
@@ -134,7 +133,7 @@ flutter_quill: ^10.1.1
 ## Troubleshooting
 
 - If the window does not appear or is not draggable, ensure `bitsdojo_window` and `window_manager` are properly initialized.
-- On Linux/macOS, some window features may behave differently due to platform limitations.
+- On macOS, some window features may behave differently due to platform limitations.
 - If alarm sound does not play, ensure your `assets/alarm.mp3` is present and declared in `pubspec.yaml`.
 
 ---
