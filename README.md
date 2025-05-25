@@ -6,9 +6,9 @@ A simple, beautiful, and powerful sticky notes application for Windows, macOS de
 
 ## 🚀 Download
 
-**[⬇️ Latest Release (Windows, macOS)](https://github.com/yourusername/StickyNoteWidget/releases)**
+**[⬇️ Latest Release (Windows, macOS)](https://github.com/ThiruvidhiRevanth/StickyNoteWidget/releases/tag/main)**
 
-Go to the [Releases page](https://github.com/yourusername/StickyNoteWidget/releases) and download the installer or zip for your platform.
+Go to the [Releases page](https://github.com/ThiruvidhiRevanth/StickyNoteWidget/releases/tag/main) and download the installer or zip for your platform.
 
 ---
 
