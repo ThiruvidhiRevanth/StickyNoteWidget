@@ -1,119 +1,119 @@
-name: Build and Release Flutter App
+# name: Build and Release Flutter App
 
-on:
-  push:
-    branches: [main]
-    tags:
-      - 'v*' # e.g. v1.0.0
-permissions:
-  contents: write      
+# on:
+#   push:
+#     branches: [main]
+#     tags:
+#       - 'v*' # e.g. v1.0.0
+# permissions:
+#   contents: write      
       
-jobs:
-  build-macos:
-    runs-on: macos-latest
+# jobs:
+#   build-macos:
+#     runs-on: macos-latest
 
-    env:
-      JAVA_HOME: /Users/runner/hostedtoolcache/Java_Oracle_jdk/17/arm64/Contents/Home
-      JAVA_HOME_17_ARM64: /Users/runner/hostedtoolcache/Java_Oracle_jdk/17/arm64/Contents/Home
-      FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.29.3-arm64
-      PUB_CACHE: /Users/runner/.pub-cache
+#     env:
+#       JAVA_HOME: /Users/runner/hostedtoolcache/Java_Oracle_jdk/17/arm64/Contents/Home
+#       JAVA_HOME_17_ARM64: /Users/runner/hostedtoolcache/Java_Oracle_jdk/17/arm64/Contents/Home
+#       FLUTTER_ROOT: /Users/runner/hostedtoolcache/flutter/stable-3.29.3-arm64
+#       PUB_CACHE: /Users/runner/.pub-cache
 
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@v3
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.29.3"
-          channel: stable
+#       - name: Setup Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           flutter-version: "3.29.3"
+#           channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
+#       - name: Install dependencies
+#         run: flutter pub get
 
-      - name: Clean and build macOS
-        run: |
-          flutter clean
-          flutter build macos --release
+#       - name: Clean and build macOS
+#         run: |
+#           flutter clean
+#           flutter build macos --release
 
-      - name: Verify build output
-        run: |
-          if [ ! -d "build/macos/Build/Products/Release/windows_widget.app" ]; then
-            echo "Build output not found! Exiting."
-            exit 1
-          fi
+#       - name: Verify build output
+#         run: |
+#           if [ ! -d "build/macos/Build/Products/Release/windows_widget.app" ]; then
+#             echo "Build output not found! Exiting."
+#             exit 1
+#           fi
 
-      - name: Debug build folder
-        run: ls -al build/macos/Build/Products/Release
+#       - name: Debug build folder
+#         run: ls -al build/macos/Build/Products/Release
 
-      - name: Create dist directory
-        run: mkdir -p dist
+#       - name: Create dist directory
+#         run: mkdir -p dist
 
-      - name: Create DMG
-        run: |
-          hdiutil create -volname "StickyNote" -srcfolder build/macos/Build/Products/Release/windows_widget.app -ov -format UDZO dist/StickyNoteWidget.dmg
+#       - name: Create DMG
+#         run: |
+#           hdiutil create -volname "StickyNote" -srcfolder build/macos/Build/Products/Release/windows_widget.app -ov -format UDZO dist/StickyNoteWidget.dmg
 
-      - name: Upload DMG
-        uses: actions/upload-artifact@v4
-        with:
-          name: macOS
-          path: dist/StickyNoteWidget.dmg
-  build-windows:
-    runs-on: windows-latest
+#       - name: Upload DMG
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: macOS
+#           path: dist/StickyNoteWidget.dmg
+#   build-windows:
+#     runs-on: windows-latest
 
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@v3
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.29.3"
-          channel: stable
+#       - name: Setup Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           flutter-version: "3.29.3"
+#           channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
+#       - name: Install dependencies
+#         run: flutter pub get
 
-      - name: Clean and build Windows
-        shell: pwsh
-        run: |
-          flutter clean
-          if (Test-Path "build/windows") {
-             Remove-Item -Recurse -Force build/windows
-          }
-          flutter build windows --release
+#       - name: Clean and build Windows
+#         shell: pwsh
+#         run: |
+#           flutter clean
+#           if (Test-Path "build/windows") {
+#              Remove-Item -Recurse -Force build/windows
+#           }
+#           flutter build windows --release
 
-      - name: Upload EXE
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: build/windows/x64/runner/Release
+#       - name: Upload EXE
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: windows
+#           path: build/windows/x64/runner/Release
 
-  release:
-    needs: [build-macos, build-windows]
-    runs-on: ubuntu-latest
+#   release:
+#     needs: [build-macos, build-windows]
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Download macOS artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: macOS
-          path: release-assets/macos
+#     steps:
+#       - name: Download macOS artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: macOS
+#           path: release-assets/macos
 
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: windows
-          path: release-assets/windows
+#       - name: Download Windows artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: windows
+#           path: release-assets/windows
 
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ github.ref_name }}
-          artifacts: |
-            release-assets/macos/StickyNoteWidget.dmg
-            release-assets/windows/*.exe
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: false
-          makeLatest: legacy
-          replacesArtifacts: true
+#       - name: Create GitHub Release
+#         uses: ncipollo/release-action@v1
+#         with:
+#           tag: ${{ github.ref_name }}
+#           artifacts: |
+#             release-assets/macos/StickyNoteWidget.dmg
+#             release-assets/windows/*.exe
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           generateReleaseNotes: false
+#           makeLatest: legacy
+#           replacesArtifacts: true
